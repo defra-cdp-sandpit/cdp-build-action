@@ -1,0 +1,42 @@
+name: 'CDP Build Action'
+description: 'builds and publishes docker image'
+inputs:
+  version:  # id of input
+    description: 'version of the build'
+    required: true
+  aws-region:
+    description: 'aws region'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: show version
+      run: echo Building version ${{ inputs.version }}.
+      shell: bash
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-region: ${{ env.AWS_REGION }}
+        role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/github-svc-infra-actions-role
+    - run: aws sts get-caller-identity
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - run: cat ${{ github.workspace }}/Dockerfile
+      shell: bash
+
+    - name: Docker Build
+      uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
+      with:
+        context: .
+        file: ./Dockerfile
+        push: false
+        tags:  ${{ env.ECR_REGISTRY }}/${{ inputs.image-name }}:${{ input.version }}
+        labels:
+          - defra.cdp.git.repo.url=${{ env.REPO_URL }}
+          - defra.cdp.service.name=${{ inputs.image-name }}
+          - git.hash=${{ env.GIT_HASH }}
