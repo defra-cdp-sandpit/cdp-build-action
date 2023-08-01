@@ -40,7 +40,7 @@ runs:
         context: .
         file: ./Dockerfile
         push: false
-        tags:  ${{ env.ECR_REGISTRY }}/${{ inputs.image-name }}:${{ inputs.version }}
+        tags:  ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ inputs.image-name }}:${{ inputs.version }}
         labels: |
           defra.cdp.git.repo.url=${{ env.REPO_URL }}
           defra.cdp.service.name=${{ inputs.image-name }}
