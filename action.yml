@@ -7,6 +7,9 @@ inputs:
   aws-region:
     description: 'aws region'
     required: true
+  image-name:
+    description: 'image of image to push'
+    required: true
 
 runs:
   using: "composite"
