@@ -43,7 +43,7 @@ runs:
       with:
         context: .
         file: ./Dockerfile
-        push: inputs.push
+        push: ${{ inputs.push }}
         tags:  ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ inputs.image-name }}:${{ inputs.version }}
         labels: |
           defra.cdp.git.repo.url=${{ github.repositoryUrl }}
