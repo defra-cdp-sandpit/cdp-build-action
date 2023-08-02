@@ -1,7 +1,7 @@
 name: 'CDP Build Action'
 description: 'builds and publishes docker image'
 inputs:
-  version:  # id of input
+  version:
     description: 'version of the build'
     required: true
   aws-region:
@@ -10,6 +10,10 @@ inputs:
   image-name:
     description: 'image of image to push'
     required: true
+  push:
+    description: 'push docker image after building'
+    required: false
+    default: true
 
 runs:
   using: "composite"
@@ -39,9 +43,10 @@ runs:
       with:
         context: .
         file: ./Dockerfile
-        push: false
+        push: inputs.push
         tags:  ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ inputs.image-name }}:${{ inputs.version }}
         labels: |
-          defra.cdp.git.repo.url=${{ env.REPO_URL }}
+          defra.cdp.git.repo.url=${{ github.repositoryUrl }}
           defra.cdp.service.name=${{ inputs.image-name }}
-          git.hash=${{ env.GIT_HASH }}
+          defra.cdp.build.run_id=${{ github.run_id }}
+          git.hash=${{ github.sha }}
