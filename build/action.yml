@@ -50,3 +50,7 @@ runs:
           defra.cdp.service.name=${{ inputs.image-name }}
           defra.cdp.build.run_id=${{ github.run_id }}
           git.hash=${{ github.sha }}
+    - name: Cleanup On Failure
+      if: ${{ failure() }}
+      run: |
+        git push --delete origin ${{ inputs.version }}
