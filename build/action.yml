@@ -4,8 +4,9 @@ description: 'builds and publishes docker image'
 
 inputs:
   version:
-    description: 'version of the build'
-    required: true
+    description: 'overrides auto-versioning'
+    required: false
+    default: false
   image-name:
     description: 'image of image to push (defaults to repo name)'
     required: false
@@ -31,13 +32,23 @@ runs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
+      # Default versioner, can be overridden by setting version input
+    - name: auto-version
+      id: version
+      if: inputs.version == false
+      uses: phips28/gh-action-bump-version@1.64.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        default: minor
+
     - name: Docker Build
       uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
       with:
         context: .
         file: ./Dockerfile
         push: ${{ inputs.push }}
-        tags:  ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ inputs.image-name }}:${{ inputs.version }}
+        tags:  ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ inputs.image-name }}:${{ steps.version.outputs.newTag || inputs.version }}
         labels: |
           defra.cdp.git.repo.url=${{ github.repositoryUrl }}
           defra.cdp.service.name=${{ inputs.image-name }}
