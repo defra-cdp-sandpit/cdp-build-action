@@ -15,6 +15,9 @@ inputs:
     description: 'push docker image after building'
     required: false
     default: true
+  github-token:
+    description: Github Token, required for autoversioning
+    required: false
 
 runs:
   using: "composite"
@@ -34,10 +37,10 @@ runs:
 
     - name: auto-version
       id: version
-      if: ${{ github.event.inputs.version == '' }}
+      if: ${{ inputs.version == '' }}
       uses: phips28/gh-action-bump-version@1.64.0
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ inputs.github-token }}
       with:
         default: minor
 
