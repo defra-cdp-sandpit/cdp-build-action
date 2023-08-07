@@ -7,7 +7,6 @@ inputs:
     description: 'overrides auto-versioning'
     required: false
     type: string
-    default: "false"
   image-name:
     description: 'image of image to push (defaults to repo name)'
     required: false
@@ -19,6 +18,8 @@ inputs:
 
 runs:
   using: "composite"
+  env:
+    
   steps:
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v2
@@ -35,7 +36,7 @@ runs:
 
     - name: auto-version
       id: version
-      if: ${{ inputs.version }}  == "false"
+      if: ${{ github.event.inputs.version == '' }}
       uses: phips28/gh-action-bump-version@1.64.0
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
