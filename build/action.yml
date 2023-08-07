@@ -6,7 +6,7 @@ inputs:
   version:
     description: 'overrides auto-versioning'
     required: false
-    default: false
+    type: string
   image-name:
     description: 'image of image to push (defaults to repo name)'
     required: false
@@ -35,7 +35,7 @@ runs:
       # Default versioner, can be overridden by setting version input
     - name: auto-version
       id: version
-      if: inputs.version == false
+      if: ${{ inputs.version == '' }}
       uses: phips28/gh-action-bump-version@1.64.0
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
