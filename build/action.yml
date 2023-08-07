@@ -6,7 +6,7 @@ inputs:
   version:
     description: 'overrides auto-versioning'
     required: false
-    default: null
+    default: false
   image-name:
     description: 'image of image to push (defaults to repo name)'
     required: false
