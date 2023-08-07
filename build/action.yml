@@ -33,10 +33,9 @@ runs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
-      # Default versioner, can be overridden by setting version input
     - name: auto-version
       id: version
-      if: ${{ inputs.version == "false" }}
+      if: ${{ inputs.version }}  == "false"
       uses: phips28/gh-action-bump-version@1.64.0
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
