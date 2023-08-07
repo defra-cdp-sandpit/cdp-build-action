@@ -38,7 +38,7 @@ runs:
     - name: auto-version
       id: version
       if: ${{ inputs.version == '' }}
-      uses: phips28/gh-action-bump-version@1.64.0
+      uses: phips28/gh-action-bump-version@1.67.0
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
       with:
