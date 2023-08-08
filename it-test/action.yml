@@ -50,6 +50,7 @@ runs:
       uses: actions/checkout@v3
       with:
         repository: ${{ inputs.docker-compose-repo }}
+        ref: main
         path: ./profiles
 
     - name: Start the profile(s)
