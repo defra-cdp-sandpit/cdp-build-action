@@ -55,7 +55,7 @@ runs:
         token: ${{ steps.cdp-gh-bot.outputs.token }}
 
     - name: Start the profile(s)
-      run: docker compose --wait up
+      run: docker compose up --wait
       working-directory: ./profiles
       shell: bash
 
