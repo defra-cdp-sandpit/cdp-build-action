@@ -55,7 +55,7 @@ runs:
         token: ${{ steps.cdp-gh-bot.outputs.token }}
 
     - name: Start the profile(s)
-      run: docker compose up --wait --quiet-pull --profile portal
+      run: docker compose --profile portal up --wait --quiet-pull
       working-directory: ./profiles
       shell: bash
 
@@ -64,6 +64,6 @@ runs:
       shell: bash
 
     - name: Stop the profile(s)
-      run: docker compose down
+      run: docker compose --profile portal down
       working-directory: ./profiles
       shell: bash
