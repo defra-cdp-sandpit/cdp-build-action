@@ -55,8 +55,12 @@ runs:
         token: ${{ steps.cdp-gh-bot.outputs.token }}
 
     - name: Start the profile(s)
-      run: docker compose up --wait
+      run: docker compose up --wait --quiet-pull --profile portal
       working-directory: ./profiles
+      shell: bash
+
+    - name: Test Placeholder
+      run: curl -v localhost:3000/cdp-portal-frontend
       shell: bash
 
     - name: Stop the profile(s)
