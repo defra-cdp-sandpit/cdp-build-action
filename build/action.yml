@@ -17,7 +17,7 @@ inputs:
     default: true
   github-token:
     description: Github Token, required for autoversioning
-    required: false
+    required: true
 
 runs:
   using: "composite"
@@ -41,8 +41,6 @@ runs:
       uses: anothrNick/github-tag-action@1.67.0
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
-      with:
-        default: minor
 
     - name: Docker Build
       uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671

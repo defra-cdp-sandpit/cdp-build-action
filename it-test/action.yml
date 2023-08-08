@@ -1,0 +1,58 @@
+name: 'CDP Integration Test Action'
+
+description: 'Starts up services and runs IT test suite'
+
+inputs:
+  docker-compose-repo:
+    required: true
+  github-token:
+    description: 'Github token, required to download docker compose profiles'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-region: ${{ env.AWS_REGION }}
+        role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/github-svc-infra-actions-role
+    - run: aws sts get-caller-identity
+
+    - name: Get Github actions secrets from ASM
+      uses: aws-actions/aws-secretsmanager-get-secrets@v1
+      with:
+        secret-ids: |
+          cdp/platform/gh_actions
+        parse-json-secrets: true
+
+    - name: Get Github app private key from ASM
+      uses: aws-actions/aws-secretsmanager-get-secrets@v1
+      with:
+        secret-ids: |
+          CDP_GH_BOT_PRIVATE_KEY,cdp/platform/gh_apps/cdp-gh-bot/private-key
+
+    - name: Get GitHub Token from cdp-gh-bot GitHub app
+      id: cdp-gh-bot
+      uses: getsentry/action-github-app-token@v2
+      with:
+        app_id: ${{ env.CDP_PLATFORM_GH_ACTIONS_CDP_GH_BOT_ID }}
+        private_key: ${{ env.CDP_GH_BOT_PRIVATE_KEY }}
+
+    - name: Checkout docker compose profiles
+      using: actions/checkout@v3
+      with:
+        repository: ${{ inputs.docker-compose-repo }}
+        path: ./profiles
+
+    - name: Start the profile(s)
+      run: docker compose --wait up
+      working-directory: ./profiles
+
+    - name: Stop the profile(s)
+      run: docker compose down
+      working-directory: ./profiles
