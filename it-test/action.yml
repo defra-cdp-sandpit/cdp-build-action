@@ -52,6 +52,7 @@ runs:
         repository: ${{ inputs.docker-compose-repo }}
         ref: main
         path: ./profiles
+        token: ${{ steps.cdp-gh-bot.outputs.token }}
 
     - name: Start the profile(s)
       run: docker compose --wait up
