@@ -21,7 +21,10 @@ runs:
       with:
         aws-region: ${{ env.AWS_REGION }}
         role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/github-svc-infra-actions-role
-    - run: aws sts get-caller-identity
+
+    - name: Configure AWS caller id
+      run: aws sts get-caller-identity
+      shell: bash
 
     - name: Get Github actions secrets from ASM
       uses: aws-actions/aws-secretsmanager-get-secrets@v1
@@ -44,7 +47,7 @@ runs:
         private_key: ${{ env.CDP_GH_BOT_PRIVATE_KEY }}
 
     - name: Checkout docker compose profiles
-      using: actions/checkout@v3
+      uses: actions/checkout@v3
       with:
         repository: ${{ inputs.docker-compose-repo }}
         path: ./profiles
@@ -52,7 +55,9 @@ runs:
     - name: Start the profile(s)
       run: docker compose --wait up
       working-directory: ./profiles
+      shell: bash
 
     - name: Stop the profile(s)
       run: docker compose down
       working-directory: ./profiles
+      shell: bash
