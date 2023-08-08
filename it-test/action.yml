@@ -60,7 +60,15 @@ runs:
       shell: bash
 
     - name: Test Placeholder
-      run: curl -v localhost:3000/cdp-portal-frontend
+      uses: actions/setup-node@v3
+      with:
+        node-version: 20
+        cache: npm
+
+    - run: npm install
+      shell: bash
+
+    - run: node test_file.js
       shell: bash
 
     - name: Stop the profile(s)
