@@ -42,6 +42,7 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
         WITH_V: false
+        DRY_RUN: true
       with:
         default: minor
 
@@ -58,3 +59,12 @@ runs:
           defra.cdp.service.name=${{ inputs.image-name }}
           defra.cdp.build.run_id=${{ github.run_id }}
           git.hash=${{ github.sha }}
+
+    - name: commit-version
+      if: ${{ inputs.version && inputs.push }}
+      uses: anothrNick/github-tag-action@1.67.0
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        WITH_V: false
+      with:
+        default: minor
