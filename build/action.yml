@@ -6,7 +6,7 @@ inputs:
   version:
     description: 'overrides auto-versioning'
     required: false
-    default: false
+    default: ''
   image-name:
     description: 'image of image to push (defaults to repo name)'
     required: false
@@ -22,6 +22,7 @@ inputs:
 runs:
   using: "composite"
   steps:
+    
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v2
       with:
@@ -37,13 +38,12 @@ runs:
 
     - name: auto-version
       id: version
-      if: ${{ inputs.version }}
+      if: inputs.version == ''
       uses: anothrNick/github-tag-action@1.67.0
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
         WITH_V: false
-      with:
-        default: minor
+        DRY_RUN: true
 
     - name: Docker Build
       uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
@@ -58,3 +58,10 @@ runs:
           defra.cdp.service.name=${{ inputs.image-name }}
           defra.cdp.build.run_id=${{ github.run_id }}
           git.hash=${{ github.sha }}
+
+    - name: commit-version
+      if: inputs.version == '' && inputs.push
+      uses: anothrNick/github-tag-action@1.67.0
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        WITH_V: false
