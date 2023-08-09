@@ -43,8 +43,6 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github-token }}
         WITH_V: false
         DRY_RUN: true
-      with:
-        default: minor
 
     - name: Docker Build
       uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
@@ -66,5 +64,3 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
         WITH_V: false
-      with:
-        default: minor
