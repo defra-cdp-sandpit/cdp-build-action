@@ -1,0 +1,13 @@
+name: 'CDP Build Action'
+
+description: 'builds and publishes docker image'
+
+inputs:
+  name:
+    description: 'name'
+    required: true
+    default: 'name'
+
+runs:
+  using: "docker"
+  image: "Dockerfile"
