@@ -16,13 +16,20 @@ inputs:
     required: false
     default: true
   github-token:
-    description: Github Token, required for autoversioning
+    description: 'Github Token, required for autoversioning'
     required: false
+  private-registry:
+    description: 'Private ECR repo to push the images to.'
+    requried: false
+    default: '094954420758.dkr.ecr.eu-west-2.amazonaws.com'
+  public-registry:
+    description: 'Public ECR repo to push the images to'
+    requried: false
+    default: ''
 
 runs:
   using: "composite"
   steps:
-    
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v2
       with:
@@ -35,23 +42,45 @@ runs:
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
+      with:
+        mask-password: 'true'
 
     - name: auto-version
       id: version
       if: inputs.version == ''
-      uses: anothrNick/github-tag-action@1.67.0
+      uses: anothrNick/github-tag-action@a2c70ae13a881faf2b4953baaa9e49731997ab36
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
         WITH_V: false
         DRY_RUN: true
 
-    - name: Docker Build
+    - name: Docker Build (Public/Private)
+      if: inputs.public-registry != ''
       uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
       with:
         context: .
         file: ./Dockerfile
         push: ${{ inputs.push }}
-        tags:  ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ inputs.image-name }}:${{ steps.version.outputs.new_tag || inputs.version }}
+        tags:  |
+          ${{ inputs.private-registry }}/${{ inputs.image-name }}:${{ steps.version.outputs.new_tag || inputs.version }}
+          ${{ inputs.public-registry }}/${{ inputs.image-name }}:${{ steps.version.outputs.new_tag || inputs.version }}
+          ${{ inputs.public-registry }}/${{ inputs.image-name }}:latest
+        labels: |
+          defra.cdp.git.repo.url=${{ github.server_url }}/${{ github.repository }}
+          defra.cdp.git.repo.name=${{ github.repository }}
+          defra.cdp.service.name=${{ inputs.image-name }}
+          defra.cdp.build.run_id=${{ github.run_id }}
+          git.hash=${{ github.sha }}
+
+    - name: Docker Build (Private)
+      if: inputs.public-registry == ''
+      uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
+      with:
+        context: .
+        file: ./Dockerfile
+        push: ${{ inputs.push }}
+        tags:  |
+          ${{ inputs.private-registry }}/${{ inputs.image-name }}:${{ steps.version.outputs.new_tag || inputs.version }}
         labels: |
           defra.cdp.git.repo.url=${{ github.server_url }}/${{ github.repository }}
           defra.cdp.git.repo.name=${{ github.repository }}
