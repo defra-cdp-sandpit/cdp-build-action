@@ -15,7 +15,7 @@ runs:
       shell: bash
 
     - name: Post init
-      if: steps.init.outcome == 'success' || steps.init.outcome == 'failure'
+      if: always() && github.ref != 'refs/heads/main' && steps.init.outcome == 'success' || steps.init.outcome == 'failure'
       uses: Jimdo/terraform-pr-commenter@v1.6.0
       with:
         commenter_type: init
