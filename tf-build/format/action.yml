@@ -11,7 +11,7 @@ runs:
       shell: bash
 
     - name: Post Format
-      if: steps.format.outcome == 'success' || steps.format.outcome == 'failure'
+      if: always() && github.ref != 'refs/heads/main' && steps.format.outcome == 'success' || steps.format.outcome == 'failure'
       uses: Jimdo/terraform-pr-commenter@v1.6.0
       with:
         commenter_type: fmt
