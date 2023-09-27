@@ -1,0 +1,23 @@
+name: "CDP Terraform Init"
+description: "Prepare Environment for Terraform Run"
+
+runs:
+  using: "composite"
+  steps:
+    # Install the latest version of Terraform CLI
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+
+      # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+    - name: Terraform Init
+      id: init
+      run: terraform init -backend-config environments/${{ env.ENVIRONMENT }}/backend.conf -reconfigure --upgrade
+      shell: bash
+
+    - name: Post init
+      if: steps.init.outcome == 'success' || steps.init.outcome == 'failure'
+      uses: Jimdo/terraform-pr-commenter@v1.6.0
+      with:
+        commenter_type: init
+        commenter_input: ${{ format('{0}{1}', steps.init.outputs.stdout, steps.init.outputs.stderr) }}
+        commenter_exitcode: ${{ steps.init.outputs.exitcode }}
