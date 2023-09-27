@@ -7,7 +7,7 @@ runs:
     # Generates an execution plan for Terraform
     - name: Terraform Plan
       id: plan
-      run: terraform plan -input=false -var-file environments/${{ env.ENVIRONMENT }}/terraform.tfvars -compact-warnings -out=${{ env.ENVIRONMENT }}.plan.file
+      run: terraform plan -input=false -var-file environments/${{ env.ENVIRONMENT }}/terraform.tfvars -compact-warnings -out=plan.file
       shell: bash
 
     - name: Post Plan
