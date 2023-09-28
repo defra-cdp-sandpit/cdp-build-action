@@ -1,0 +1,11 @@
+name: "CDP Terraform Apply"
+description: "Runs a Terraform Apply"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Terraform Apply
+      id: apply
+      run: echo "DOING NOTHING RIGHT NOW"
+      # run: terraform apply -input=false -compact-warnings ${{ env.ENVIRONMENT }}.plan.file
+      shell: bash
