@@ -1,0 +1,15 @@
+name: "CDP Mongo User Creation"
+description: "Triggers update of mongo user roles"
+
+inputs:
+  topicName:
+    description: Which sns topic to send the message to
+  environment: 
+    description: Environment the queue is in
+
+runs:
+  using: "composite"
+  steps:
+    - name: Update Mongodb Users
+      run: |
+        aws sns publish --topic-arn ${{ topicName }} --message "$(cat environments/${{ inputs.environment }}/resources/tenant_services.json)"
