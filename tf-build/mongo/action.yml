@@ -12,4 +12,4 @@ runs:
   steps:
     - name: Update Mongodb Users
       run: |
-        aws sns publish --topic-arn ${{ inputs.topicArn }} --message "$(cat environments/${{ inputs.environment }}/resources/tenant_services.json)"
+        aws sns publish --topic-arn ${{ inputs.topicArn }} --message file://environments/${{ inputs.environment }}/resources/tenant_services.json
