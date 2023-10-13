@@ -1,0 +1,13 @@
+name: "CDP Mongo User Creation"
+description: "Triggers update of mongo user roles"
+
+inputs:
+  topicArn:
+    description: Which sns topic to send the message to
+
+runs:
+  using: "composite"
+  steps:
+    - name: Update Mongodb Users
+      run: |
+        aws sns publish --topic-arn ${{ inputs.topicArn }} --message file://environments/${{ env.ENVIRONMENT }}/resources/tenant_services.json
