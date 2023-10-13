@@ -9,5 +9,6 @@ runs:
   using: "composite"
   steps:
     - name: Update Mongodb Users
+      shell: bash
       run: |
         aws sns publish --topic-arn ${{ inputs.topicArn }} --message file://environments/${{ env.ENVIRONMENT }}/resources/tenant_services.json
