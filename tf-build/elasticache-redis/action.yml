@@ -1,0 +1,20 @@
+name: "CDP Elasticache Redis User Creation"
+description: "Triggers updates to the Elasticache Redis Users"
+
+inputs:
+  topicArn:
+    description: Which sns topic to send the message to
+  targetEnv:
+    description: The target environment for the tenant_services.json
+
+runs:
+  using: "composite"
+  steps:
+    - name: Manage Redis Users
+      shell: bash
+      run: |
+        message_id=$(uuidgen)
+        aws sns publish --topic-arn ${{ inputs.topicArn }}  --message-attributes \
+        '{"environment" : { "DataType":"String", "StringValue":"${{ inputs.targetEnv }}"}}' \
+        --message file://environments/${{ inputs.targetEnv }}/resources/tenant_services.json \
+        --message-group-id "${{ inputs.targetEnv }}" --message-deduplication-id ${message_id}
