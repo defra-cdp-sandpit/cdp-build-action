@@ -1,13 +1,21 @@
 name: "CDP Terraform Plan - no lock"
 description: "Runs a Terraform Plan without a lock"
 
+inputs:
+  tf_path:
+    description: 'A root directory with Terraform files'
+    required: false
+    default: '.'
+
 runs:
   using: "composite"
   steps:
     # Generates an execution plan for Terraform
     - name: Terraform Plan - no lock
       id: plan
-      run: terraform plan -input=false -var-file environments/${{ env.ENVIRONMENT }}/terraform.tfvars -compact-warnings -lock=false
+      run: |
+        cd ${{ inputs.tf_path }}
+        terraform plan -input=false -var-file environments/${{ env.ENVIRONMENT }}/terraform.tfvars -compact-warnings -lock=false
       shell: bash
 
     #- name: Post Plan
