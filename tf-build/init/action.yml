@@ -10,9 +10,11 @@ inputs:
 runs:
   using: "composite"
   steps:
-    # Install the latest version of Terraform CLI
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v1
+    # Install Terraform CLI pinned version
+    - name: Terraform - setup
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: "1.7.5"
 
       # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
     - name: Terraform Init
