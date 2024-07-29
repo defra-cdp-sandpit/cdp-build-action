@@ -1,0 +1,49 @@
+name: 'CDP Get GitHub Token'
+
+description: 'Gets a github cert from AWS Secret Manager and extracts a PAT token'
+
+inputs:
+  role_to_assume:
+    description: The IAM role to assume for fetching Secrets
+    required: true
+  app_id:
+    description: GitHub app ID
+    required: true
+  private_key_id:
+    description: Secret for GitHub App
+    required: true
+outputs:
+  token:
+    description: GitHub token from secret
+    value: ${{ steps.export.token }}
+
+runs:
+  using: "composite"
+  steps:
+    # Setup exectuion for AWS
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-region: ${{ env.AWS_REGION }}
+        role-to-assume: ${{ inputs.role_to_assume }}
+    - run: aws sts get-caller-identity
+      shell: bash
+
+    # Get the private git
+    - name: Get Github app private key from ASM
+      uses: aws-actions/aws-secretsmanager-get-secrets@v1
+      with:
+        secret-ids: |
+          PRIVATE_KEY, ${{ inputs.private_key_id }}
+
+    # Github auth using Github App - environment variables are set by previous step action
+    - name: Get token
+      id: cdp-gh-action
+      uses: getsentry/action-github-app-token@v2
+      with:
+        app_id: ${{ inputs.app_id }}
+        private_key: ${{ env.PRIVATE_KEY }}
+
+    - name: export
+      shell: bash
+      run: echo 'token=${{ steps.get-token.outputs.token }}' >> $GITHUB_OUTPUT
