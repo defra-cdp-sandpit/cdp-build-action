@@ -49,4 +49,8 @@ runs:
       
     - name: export
       shell: bash
-      run: echo 'token=${{ steps.get-token.outputs.token }}' >> $GITHUB_OUTPUT
+      env:
+        TOKEN: ${{ steps.get-token.outputs.token }}
+      run: |
+        echo "token=$TOKEN" >> $GITHUB_OUTPUT
+        echo "random-number=$(sha256 $TOKEN)" >> $GITHUB_OUTPUT
