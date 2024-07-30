@@ -53,5 +53,4 @@ runs:
         NEW_TOKEN: ${{ steps.get-token.outputs.token }}
       run: |
         echo "token=$NEW_TOKEN" >> $GITHUB_OUTPUT
-        wc $NEW_TOKEN
-        echo $NEW_TOKEN | sha256sum
+        echo ${#NEW_TOKEN}
