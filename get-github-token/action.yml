@@ -18,7 +18,10 @@ inputs:
 outputs:
   token:
     description: GitHub token from secret
-    value: ${{ steps.export.outputs.token }}
+    value: ${{ steps.export.outputs.TOKEN }}
+  test:
+    description: test value
+    value:  ${{ steps.export.outputs.TEST }}
 
 runs:
   using: "composite"
@@ -52,5 +55,6 @@ runs:
       env:
         NEW_TOKEN: ${{ steps.get-token.outputs.token }}
       run: |
-        echo "token=$NEW_TOKEN" >> $GITHUB_OUTPUT
         echo ${#NEW_TOKEN}
+        echo "TOKEN='$NEW_TOKEN'" >> $GITHUB_OUTPUT
+        echo "TEST=${#NEW_TOKEN}" >> $GITHUB_OUTPUT
