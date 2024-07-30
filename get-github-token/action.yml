@@ -1,6 +1,6 @@
 name: 'Get GitHub Token'
 
-description: 'Gets a github cert from AWS Secret Manager and extracts a PAT token'
+description: 'Gets a github cert from AWS Secret Manager and extracts a PAT token and sets GH_ACTION'
 
 inputs:
   role_to_assume:
@@ -15,13 +15,6 @@ inputs:
   aws_region:
     description: AWS Region
     default: eu-west-2
-outputs:
-  token:
-    description: GitHub token from secret
-    value: ${{ steps.export.outputs.TOKEN }}
-  test:
-    description: test value
-    value:  ${{ steps.export.outputs.TEST }}
 
 runs:
   using: "composite"
@@ -49,13 +42,11 @@ runs:
       with:
         app_id: ${{ inputs.app_id }}
         private_key: ${{ env.PRIVATE_KEY }}
-      
+
+    # Set the GH_TOKEN environment variable, replacing the default token
     - name: export
       shell: bash
       env:
-        NEW_TOKEN: ${{ steps.get-token.outputs.token }}
+        TOKEN: ${{ steps.get-token.outputs.token }}
       run: |
-        echo ${#NEW_TOKEN}
-        echo "TOKEN=$NEW_TOKEN" >> $GITHUB_OUTPUT
-        echo "TOKEN=$NEW_TOKEN" >> $GITHUB_ENV
-        echo "TEST=${#NEW_TOKEN}" >> $GITHUB_OUTPUT
+        echo "GH_TOKEN=$TOKEN" >> $GITHUB_ENV
