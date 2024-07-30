@@ -50,7 +50,8 @@ runs:
     - name: export
       shell: bash
       env:
-        TOKEN: ${{ steps.get-token.outputs.token }}
+        NEW_TOKEN: ${{ steps.get-token.outputs.token }}
       run: |
-        echo "token=$TOKEN" >> $GITHUB_OUTPUT
-        echo "random-number=$(sha256 $TOKEN)" >> $GITHUB_OUTPUT
+        echo "token=$NEW_TOKEN" >> $GITHUB_OUTPUT
+        wc $NEW_TOKEN
+        echo $NEW_TOKEN | sha256sum
