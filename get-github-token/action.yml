@@ -41,15 +41,11 @@ runs:
 
     # Github auth using Github App - environment variables are set by previous step action
     - name: Get token
-      id: cdp-gh-action
-      uses: getsentry/action-github-app-token@v2
+      id: get-token
+      uses: getsentry/action-github-app-token@v3
       with:
         app_id: ${{ inputs.app_id }}
         private_key: ${{ env.PRIVATE_KEY }}
-
-    - name: Set Token
-      shell: bash
-      run: echo "GH_TOKEN=${{ steps.get-token.outputs.token }}" >> $GITHUB_ENV
       
     - name: export
       shell: bash
