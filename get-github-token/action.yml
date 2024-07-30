@@ -18,7 +18,7 @@ inputs:
 outputs:
   token:
     description: GitHub token from secret
-    value: ${{ steps.export.token }}
+    value: ${{ steps.export.outputs.token }}
 
 runs:
   using: "composite"
