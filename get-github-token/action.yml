@@ -57,4 +57,5 @@ runs:
       run: |
         echo ${#NEW_TOKEN}
         echo "TOKEN='$NEW_TOKEN'" >> $GITHUB_OUTPUT
+        echo "TOKEN='$NEW_TOKEN'" >> $GITHUB_ENV
         echo "TEST=${#NEW_TOKEN}" >> $GITHUB_OUTPUT
