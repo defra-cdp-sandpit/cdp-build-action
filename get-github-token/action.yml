@@ -78,5 +78,7 @@ runs:
           git config --global user.email $USERNAME
         fi
         git config -l
+        pwd
+        ls
 
       
