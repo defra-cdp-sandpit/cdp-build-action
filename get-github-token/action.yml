@@ -66,6 +66,7 @@ runs:
       run: |
         if [ -d ".git" ]; then
           git config --local --remove-section http."https://github.com/"
+          git config -l --local
         else
           echo '!! No git repo found! You must run "git config --local --remove-section http."https://github.com/" after you check out in order to push using this token'
         fi
@@ -76,5 +77,6 @@ runs:
         if [ -n "$EMAIL" ]; then
           git config --global user.email $USERNAME
         fi
+        git config -l
 
       
