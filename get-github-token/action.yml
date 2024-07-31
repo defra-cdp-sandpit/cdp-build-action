@@ -70,7 +70,7 @@ runs:
         else
           echo '!! No git repo found! You must run "git config --local --remove-section http."https://github.com/" after you check out in order to push using this token'
         fi
-        git config --global url."https://x-access-token:${{ steps.cdp-gh-action.outputs.token }}@github.com".insteadOf "https://github.com"
+        git config --global url."https://x-access-token:${{ steps.get-token.outputs.token }}@github.com".insteadOf "https://github.com"
         if [ -n "$USERNAME" ]; then
           git config --global user.name $USERNAME
         fi
