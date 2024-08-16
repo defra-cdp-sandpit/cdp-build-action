@@ -22,7 +22,7 @@ runs:
   using: "composite"
   steps:
     - name: Cannot run on main
-      if: contains(github.ref, "release")
+      if: github.ref == 'refs/heads/main'
       shell: bash
       run: |
           echo "You cannot do hotfixes from the main branch!"
