@@ -1,6 +1,6 @@
 name: 'CDP Build Hot Fix Action'
 
-description: 'builds and publishes docker image to ECR and DockerHub from a branch as a patch release'
+description: 'Builds and publishes docker image to ECR and DockerHub from a branch as a patch release'
 
 inputs:
   image-name:
@@ -21,7 +21,11 @@ inputs:
 runs:
   using: "composite"
   steps:
-    
+    - name: Running on non-main branch
+      if: {{ github.ref == 'ref/head/main' }}
+      run: |
+          echo "You cannot do hotfixes from the main branch!"
+          exit 1
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v2
       with:
