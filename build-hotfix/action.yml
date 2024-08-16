@@ -21,8 +21,9 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Running on non-main branch
-      if: {{ github.ref == 'ref/head/main' }}
+    - name: Cannot run on main
+      if: contains(github.ref, "release")
+      shell: bash
       run: |
           echo "You cannot do hotfixes from the main branch!"
           exit 1
