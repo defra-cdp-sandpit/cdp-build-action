@@ -86,3 +86,6 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
         WITH_V: false
+        DEFAULT_BUMP: patch
+        TAG_CONTEXT: branch
+
