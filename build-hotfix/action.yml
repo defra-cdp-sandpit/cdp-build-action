@@ -1,0 +1,96 @@
+name: 'CDP Build Hot Fix Action'
+
+description: 'Builds and publishes docker image to ECR and DockerHub from a branch as a patch release'
+
+inputs:
+  image-name:
+    description: 'image of image to push (defaults to repo name)'
+    required: false
+    default: ${{ github.event.repository.name }}
+  push:
+    description: 'push docker image after building'
+    required: false
+    default: true
+  github-token:
+    description: Github Token, required for autoversioning
+    required: false
+  gh_actions_secrets:
+    description: Secret for Github Actions to run Terraform
+    default: cdp/platform/gh_actions
+
+runs:
+  using: "composite"
+  steps:
+    - name: Cannot run on main
+      if: github.ref == 'refs/heads/main'
+      shell: bash
+      run: |
+          echo "You cannot do hotfixes from the main branch!"
+          exit 1
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-region: ${{ env.AWS_REGION }}
+        role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/github-${{ inputs.image-name }}-build-role
+
+    - run: aws sts get-caller-identity
+      shell: bash
+
+   # Get Docker secrets from ASM
+    - name: Get Github actions secrets from ASM
+      uses: aws-actions/aws-secretsmanager-get-secrets@v1
+      with:
+        secret-ids: |
+          ${{ inputs.gh_actions_secrets }}
+        parse-json-secrets: true
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+      with:
+        mask-password: 'true'
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ env.CDP_PLATFORM_GH_ACTIONS_DEFRADIGITAL_DOCKER_HUB_USERNAME}}
+        password: ${{ env.CDP_PLATFORM_GH_ACTIONS_DEFRADIGITAL_DOCKER_HUB_TOKEN }}
+
+    - name: auto-version
+      id: version
+      uses: anothrNick/github-tag-action@1.67.0
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        WITH_V: false
+        DRY_RUN: true
+        DEFAULT_BUMP: patch
+        TAG_CONTEXT: branch
+
+    - name: Docker Build
+      uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
+      with:
+        context: .
+        no-cache: true
+        file: ./Dockerfile
+        push: ${{ inputs.push }}
+        tags: |
+          ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ inputs.image-name }}:${{ steps.version.outputs.new_tag }}
+          defradigital/${{ inputs.image-name }}:${{ steps.version.outputs.new_tag }}
+        labels: |
+          defra.cdp.git.repo.url=${{ github.server_url }}/${{ github.repository }}
+          defra.cdp.git.repo.name=${{ github.repository }}
+          defra.cdp.service.name=${{ inputs.image-name }}
+          defra.cdp.build.run_id=${{ github.run_id }}
+          defra.cdp.run_mode=service
+          defra.cdp.hotfix=${{ steps.version.outputs.new_tag }}
+          git.hash=${{ github.sha }}
+
+    - name: commit-version
+      if: inputs.push
+      uses: anothrNick/github-tag-action@1.67.0
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        WITH_V: false
+        DEFAULT_BUMP: patch
+        TAG_CONTEXT: branch
+
