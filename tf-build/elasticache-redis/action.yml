@@ -17,6 +17,7 @@ runs:
   steps:
     - name: Check if JSON merge needed
       id: check_merge
+      shell: bash
       run: echo "merge=${{ inputs.mergeJsonFiles }}" >> $GITHUB_ENV
 
     - name: Construct merged_tenant_services.json from multiple files
