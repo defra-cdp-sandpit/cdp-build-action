@@ -24,7 +24,6 @@ runs:
       if: ${{ env.merge == 'true' }}
       shell: bash
       run: |
-        merged_file_tmp=environments/${{ inputs.targetEnv }}/resources/merged_tenant_services_tmp.json
         merged_file=environments/${{ inputs.targetEnv }}/resources/merged_tenant_services.json
         echo "[" > $merged_file
 
@@ -33,14 +32,13 @@ runs:
           if [ "$first" = true ]; then
             first=false
           else
-            echo "," >> $merged_file_tmp
+            echo "," >> $merged_file
           fi
           service_name=$(basename "$file" .json)
-          echo "{\"$service_name\": $(cat $file)}" >> $merged_file_tmp
+          echo "{\"$service_name\": $(cat $file)}" >> $merged_file
         done
 
-        echo "]" >> $merged_file_tmp
-        cat $merged_file_tmp | jq > $merged_file
+        echo "]" >> $merged_file
 
     - name: Manage Redis Users
       shell: bash
