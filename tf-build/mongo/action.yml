@@ -40,8 +40,17 @@ runs:
     - name: Update Mongodb Users
       shell: bash
       run: |
-        json_file="environments/${{ env.ENVIRONMENT }}/resources/tenant_services.json"
+        original_json_file="environments/${{ env.ENVIRONMENT }}/resources/tenant_services.json"
         if [[ ${{ env.merge }} == 'true' ]]; then
-          json_file="environments/${{ env.ENVIRONMENT }}/resources/merged_tenant_services.json"
+          merged_json_file="environments/${{ env.ENVIRONMENT }}/resources/merged_tenant_services.json"
         fi
-        aws sns publish --topic-arn ${{ inputs.topicArn }} --message file://${json_file}
+        diff $original_json_file $merged_json_file
+
+    # - name: Update Mongodb Users
+    #   shell: bash
+    #   run: |
+    #     json_file="environments/${{ env.ENVIRONMENT }}/resources/tenant_services.json"
+    #     if [[ ${{ env.merge }} == 'true' ]]; then
+    #       json_file="environments/${{ env.ENVIRONMENT }}/resources/merged_tenant_services.json"
+    #     fi
+    #     aws sns publish --topic-arn ${{ inputs.topicArn }} --message file://${json_file}
