@@ -44,4 +44,4 @@ runs:
         if [[ ${{ env.merge }} == 'true' ]]; then
           json_file="environments/${{ env.ENVIRONMENT }}/resources/merged_tenant_services.json"
         fi
-        aws sns publish --topic-arn ${{ inputs.topicArn }} --message file://${{json_file}
+        aws sns publish --topic-arn ${{ inputs.topicArn }} --message file://${json_file}
