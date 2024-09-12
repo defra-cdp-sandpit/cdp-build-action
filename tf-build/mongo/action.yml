@@ -4,11 +4,46 @@ description: "Triggers update of mongo user roles"
 inputs:
   topicArn:
     description: Which sns topic to send the message to
+  mergeJsonFiles:
+    description: "Merge JSON files to create tenant_services.json"
+    required: false
+    default: false
 
 runs:
   using: "composite"
   steps:
+    - name: Check if JSON merge needed
+      id: check_merge
+      shell: bash
+      run: echo "merge=${{ inputs.mergeJsonFiles }}" >> $GITHUB_ENV
+
+    - name: Construct merged_tenant_services.json from multiple files
+      if: ${{ env.merge == 'true' }}
+      shell: bash
+      run: |
+        echo "Construct merged_tenant_services.json from multiple files"
+        merged_file=environments/${{ env.ENVIRONMENT }}/resources/merged_tenant_services.json
+        echo "[{" > $merged_file
+
+        first=true
+        for file in environments/${{ env.ENVIRONMENT }}/tenants/*.json; do
+          if [ "$first" = true ]; then
+            first=false
+          else
+            echo "," >> $merged_file
+          fi
+          service_name=$(basename "$file" .json)
+          echo "\"$service_name\": $(cat $file)" >> $merged_file
+        done
+
+        echo "}]" >> $merged_file
+
     - name: Update Mongodb Users
       shell: bash
       run: |
-        aws sns publish --topic-arn ${{ inputs.topicArn }} --message file://environments/${{ env.ENVIRONMENT }}/resources/tenant_services.json
+        json_file="environments/${{ env.ENVIRONMENT }}/resources/tenant_services.json"
+        if [[ ${{ env.merge }} == 'true' ]]; then
+          json_file="environments/${{ env.ENVIRONMENT }}/resources/merged_tenant_services.json"
+        fi
+        echo "Updating users with ${json_file}"
+        aws sns publish --topic-arn ${{ inputs.topicArn }} --message file://${json_file}
