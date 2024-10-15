@@ -21,8 +21,9 @@ runs:
     - name: Post Plan
       if: always() && github.ref != 'refs/heads/main' && steps.plan.outcome == 'success' || steps.plan.outcome == 'failure'
       uses: GetTerminus/terraform-pr-commenter@v3
+      env:
+        TF_WORKSPACE: ${{ env.ENVIRONMENT }}
       with:
         commenter_type: plan
         commenter_plan_path: tf_plan.txt
-        #commenter_input: ${{ format('{0}{1}', steps.plan.outputs.stdout, steps.plan.outputs.stderr) }}
         commenter_exitcode: ${{ steps.plan.outputs.exitcode }}
